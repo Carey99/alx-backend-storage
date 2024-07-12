@@ -4,3 +4,4 @@ SELECT band_name,
 FROM metal_bands
 WHERE FIND_IN_SET('Glam rock', IFNULL(style, "")) > 0
 ORDER BY lifespan DESC;
+
