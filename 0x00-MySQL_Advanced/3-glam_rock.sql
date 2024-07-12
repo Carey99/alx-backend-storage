@@ -1,6 +1,6 @@
--- Lists all brand with Glam rock ranked by longevity
+-- Write a SQL script that lists all bands with Glam rock
 SELECT band_name,
-       2022 - formed AS lifespan
+	(IFNULL(split, '2020') - formed) AS lifespan
 FROM metal_bands
-WHERE split = 'Glam rock'
+WHERE FIND_IN_SET('Glam rock', IFNULL(style, "")) > 0
 ORDER BY lifespan DESC;
