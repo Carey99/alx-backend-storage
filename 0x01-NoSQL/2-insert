@@ -1,5 +1,5 @@
-// Insert values in a db
+// Insert values in a db, db will be passeed with mongo command
 
-db.school.Insert({
+db.school.insertOne({
     name: "Holberton school"
-})
+});
