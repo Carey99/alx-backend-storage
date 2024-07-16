@@ -1,0 +1,3 @@
+// Insert values in a db
+
+db.school.Insert({"name": "Holberton school"})
