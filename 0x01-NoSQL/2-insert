@@ -1,3 +1,5 @@
 // Insert values in a db
 
-db.school.InsertOne({name: "Holberton school"})
+db.school.Insert({
+    name: "Holberton school"
+})
