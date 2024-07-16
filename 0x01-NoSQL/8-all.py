@@ -7,12 +7,13 @@ from typing import List
 import pymongo
 
 
-if __name__ == "__main__":
-    def list_all(mongo_collection) -> List:
-        """ list_all - lists all documents in a collection
-        Args:
-            mongo_collection: pymongo collection object
-        Returns: list of documents or empty list
-        """
-        documents = list(mongo_collection.find())
-        return documents if documents else []
+def list_all(mongo_collection) -> List:
+    """ list_all - lists all documents in a collection
+    Args:
+        mongo_collection: pymongo collection object
+    Returns: list of documents or empty list
+    """
+    docs = []
+    for doc in mongo_collection.find():
+        docs.append(doc)
+    return docs
