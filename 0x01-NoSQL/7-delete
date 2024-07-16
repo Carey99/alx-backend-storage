@@ -1,0 +1,3 @@
+// deletes all instances in a colection
+
+db.collection.deleteMany({name: "Holberton school"})
