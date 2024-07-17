@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
     Inserts a new doc in a colection based on kwargs
 """
