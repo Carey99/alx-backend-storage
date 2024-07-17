@@ -4,7 +4,7 @@
 """
 
 
-def insert_school(mongo_colletion, **kwargs):
+def insert_school(mongo_collection, **kwargs):
     """Inserts a new doc"""
     added = mongo_collection.insert_one(kwargs)
     return added.inserted_id
