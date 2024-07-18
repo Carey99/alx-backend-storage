@@ -7,7 +7,7 @@
 import redis
 import uuid
 from typing import Union, Callable
-from functools import wraps
+from functools import wraps, cache
 
 
 class Cache:
@@ -65,14 +65,15 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def replay(self):
-        methods = self._redis.keys("*:inputs")
-        for method in methods:
-            method_name = method.decode("utf-8").split(":")[0]
-            inputs = self._redis.lrange(method, 0, -1)
-            outputs = self._redis.lrange(method_name + ":outputs", 0, -1)
-            print(f"Method: {method_name}")
-            for i in range(len(inputs)):
-                print(f"Input: {inputs[i].decode('utf-8')}")
-                print(f"Output: {outputs[i].decode('utf-8')}")
-            print()
+    def replay(func):
+        method_name = func.__qualname__
+        input_key = method_name + ":inputs"
+        output_key = method_name + ":outputs"
+        inputs = cache._redis.lrange(input_key, 0, -1)
+        outputs = cache._redis.lrange(output_key, 0, -1)
+        num_calls = len(inputs)
+        print(f"{method_name} was called {num_calls} times:")
+        for input_data, output_data in zip(inputs, outputs):
+            input_args = eval(input_data.decode())
+            output_result = eval(output_data.decode())
+            print(f"{method_name}(*{input_args}) -> {output_result}")
