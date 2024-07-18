@@ -65,15 +65,26 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def replay(func):
-        method_name = func.__qualname__
-        input_key = method_name + ":inputs"
-        output_key = method_name + ":outputs"
-        inputs = cache._redis.lrange(input_key, 0, -1)
-        outputs = cache._redis.lrange(output_key, 0, -1)
-        num_calls = len(inputs)
-        print(f"{method_name} was called {num_calls} times:")
-        for input_data, output_data in zip(inputs, outputs):
-            input_args = eval(input_data.decode())
-            output_result = eval(output_data.decode())
-            print(f"{method_name}(*{input_args}) -> {output_result}")
+    def replay(fn: Callable) -> None:
+        '''Displays the call history of a Cache class' method.
+        '''
+        if fn is None or not hasattr(fn, '__self__'):
+            return
+        redis_store = getattr(fn.__self__, '_redis', None)
+        if not isinstance(redis_store, redis.Redis):
+            return
+        fxn_name = fn.__qualname__
+        in_key = '{}:inputs'.format(fxn_name)
+        out_key = '{}:outputs'.format(fxn_name)
+        fxn_call_count = 0
+        if redis_store.exists(fxn_name) != 0:
+            fxn_call_count = int(redis_store.get(fxn_name))
+        print('{} was called {} times:'.format(fxn_name, fxn_call_count))
+        fxn_inputs = redis_store.lrange(in_key, 0, -1)
+        fxn_outputs = redis_store.lrange(out_key, 0, -1)
+        for fxn_input, fxn_output in zip(fxn_inputs, fxn_outputs):
+            print('{}(*{}) -> {}'.format(
+                fxn_name,
+                fxn_input.decode("utf-8"),
+                fxn_output,
+            ))
