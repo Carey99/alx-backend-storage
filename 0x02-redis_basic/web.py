@@ -6,10 +6,17 @@ import redis
 import requests
 from functools import wraps
 from typing import Callable
+from datetime import datetime
 
 
+def log_request(method: Callable) -> Callable:
+    @wraps(method)
+    def wrapper(url) -> str:
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'Request for {url} received at {timestamp}')
+        return method(url)
+    return wrapper
 redis_store = redis.Redis()
-
 
 def data_cacher(method: Callable) -> Callable:
     @wraps(method)
