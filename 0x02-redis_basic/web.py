@@ -8,30 +8,20 @@ from functools import wraps
 from typing import Callable
 from datetime import datetime
 
+# Create a Redis client
+redis_client = redis.Redis()
 
-def log_request(method: Callable) -> Callable:
-    @wraps(method)
-    def wrapper(url) -> str:
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'Request for {url} received at {timestamp}')
-        return method(url)
-    return wrapper
-redis_store = redis.Redis()
-
-def data_cacher(method: Callable) -> Callable:
-    @wraps(method)
-    def invoker(url) -> str:
-        redis_store.incr(f'count:{url}')
-        result = redis_store.get(f'result:{url}')
-        if result:
-            return result.decode('utf-8')
-        result = method(url)
-        redis_store.set(f'count:{url}', 0)
-        redis_store.setex(f'result:{url}', 10, result)
-        return result
-    return invoker
-
-
-@data_cacher
 def get_page(url: str) -> str:
-    return requests.get(url).text
+    # Check if the URL is already cached
+    cached_content = redis_client.get(url)
+    if cached_content:
+        return cached_content.decode()
+
+    # Make the request to the URL
+    response = requests.get(url)
+    content = response.text
+
+    # Cache the content with an expiration time of 10 seconds
+    redis_client.setex(url, 10, content)
+
+    return content
