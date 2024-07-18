@@ -64,3 +64,15 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
+
+    def replay(self):
+        methods = self._redis.keys("*:inputs")
+        for method in methods:
+            method_name = method.decode("utf-8").split(":")[0]
+            inputs = self._redis.lrange(method, 0, -1)
+            outputs = self._redis.lrange(method_name + ":outputs", 0, -1)
+            print(f"Method: {method_name}")
+            for i in range(len(inputs)):
+                print(f"Input: {inputs[i].decode('utf-8')}")
+                print(f"Output: {outputs[i].decode('utf-8')}")
+            print()
