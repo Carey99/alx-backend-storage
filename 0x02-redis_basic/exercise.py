@@ -20,7 +20,7 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable = None) ->Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float, None]:
         data = self._redis.get(key)
         if data is None:
             return None
@@ -33,7 +33,7 @@ class Cache:
 
     def get_int(self, key: str) -> Union[int, None]:
         return self.get(key, fn=int)
-    
+
     def count_calls(method: Callable) -> Callable:
         @wraps(method)
         def wrapper(self, *args, **kwargs):
